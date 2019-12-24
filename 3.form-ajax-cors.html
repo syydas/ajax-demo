@@ -51,7 +51,7 @@
         ajax(
           'http://localhost:3000', {
             type: 'get',
-            data: {},
+            data: { page: 1 },
             success: requestSuccess,
             error: function (error) {
               console.log(error);

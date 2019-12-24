@@ -1,8 +1,7 @@
 window.ajax = function (url, options) {
   options = options || {};
   options.data = options.data || {};
-json
-  // 判断是 ajax 请求还是 jsonp 请求
+
   var json = options.jsonp ? jsonp(options) : json(options);
 
   function json(options) {
@@ -10,8 +9,6 @@ json
     options.data = formatParams(options.data);
     var xhr = null;
 
-
-    // 实例化XMLHttpRequest对象 
     if (window.XMLHttpRequest) {
       xhr = new XMLHttpRequest();
     } else {
@@ -39,12 +36,12 @@ json
 
     // 连接和传输数据 
     if (options.type == 'GET') {
-      xhr.open(options.type, url + '?' + options.data, true);
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+      xhr.open(options.type, url + '?' + options.data);
       xhr.send(null);
     } else {
-      xhr.open(options.type, options.url, true);
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+      xhr.open(options.type, url);
+      // xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+      xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
       xhr.send(options.data);
     }
   }
@@ -52,17 +49,17 @@ json
   function jsonp(options) {
     //创建script标签并加入到页面中 
     var callbackName = options.jsonp;
-    var head = document.getElementsByTagName('head')[0];
+    var body = document.querySelector('body');
     // 设置传递给后台的回调参数名 
     options.data['callback'] = callbackName;
     var data = formatParams(options.data);
     var time = options.time || 5000;
     var script = document.createElement('script');
-    head.appendChild(script);
+    body.appendChild(script);
 
     //创建jsonp回调函数 
     window[callbackName] = function (json) {
-      head.removeChild(script);
+      body.removeChild(script);
       clearTimeout(script.timer);
       window[callbackName] = null;
       options.success && options.success(json);
@@ -74,7 +71,7 @@ json
     if (time) {
       script.timer = setTimeout(function () {
         window[callbackName] = null;
-        head.removeChild(script);
+        body.removeChild(script);
         options.error && options.error({
           message: '超时'
         });
